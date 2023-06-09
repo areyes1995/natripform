@@ -1,3 +1,14 @@
+<?php
+	$allAsk = 	file_get_contents('http://localhost/form/backend/validate.php?allAsk');
+	
+	if ($allAsk === null) {
+		$allAsk = json_encode([]);
+		return;
+	}
+
+	$askCount = round(json_decode($allAsk)->data->total/4);
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +22,11 @@
 	<!-- datepicker -->
 	<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">
 	<!-- Main Style Css -->
+	<link rel="stylesheet" type="text/css" href="css/fontawesome/css/all.css">
     <link rel="stylesheet" href="css/style.css"/>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" >
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" ></script>
 </head>
 <body>
 	<div class="page-content" style="background: #0075DF;">
@@ -55,77 +70,44 @@
 			            </section>
 						<!-- SECTION 2 -->
 			            <h2>2</h2>
-			            <section>
+						<section>
 			                <div class="inner">
-								<div class="form-row">
-									<div class="form-holder form-holder-2">
-										<select name="location" id="location" class="form-control">
-											<option value="" disabled selected>Choose A Location</option>
-											<option value="united states">United States</option>
-											<option value="united kingdom">United Kingdom</option>
-											<option value="viet nam">Viet Nam</option>
-										</select>
-										<span class="select-btn">
-											<i class="zmdi zmdi-chevron-down"></i>
-										</span>
-									</div>
-								</div>
-								<div class="form-row">
-									<div class="form-holder">
-										<input type="text" name="date" class="date" id="date" placeholder="15 / Jan / 2018">
-									</div>
-									<div class="form-holder">
-										<select name="" id="time" class="form-control">
-											<option value="7:00am - 18:00pm" selected>7:00am - 18:00pm</option>
-											<option value="9:00am - 21:00pm">9:00am - 21:00pm</option>
-											<option value="10:00am - 22:00pm">10:00am - 22:00pm</option>
-											<option value="12:00am - 24:00pm">12:00am - 24:00pm</option>
-										</select>
-										<span class="select-btn">
-											<i class="zmdi zmdi-chevron-down"></i>
-										</span>
-									</div>
-								</div>
-							</div>
-			            </section>
-			            <!-- SECTION 3 -->
-			            <h2>3</h2>
-			            <section>
-			                <div class="inner">
+								<b style="position: absolute;">Tu información</b>
 								<div class="form-row table-responsive">
 									<table class="table">
 										<tbody>
 											<tr class="space-row">
-												<th>Full Name:</th>
-												<td id="fullname-val">Benjamin Harrison</td>
+												<th>Nombre Completo:</th>
+												<td id="fullname-val"></td>
 											</tr>
 											<tr class="space-row">
 												<th>Phone:</th>
-												<td id="phone-val">+1 888-999-2222</td>
+												<td id="phone-val"></td>
 											</tr>
 											<tr class="space-row">
 												<th>Email:</th>
-												<td id="email-val">allison.long@example.com</td>
+												<td id="email-val"></td>
 											</tr>
 											<tr class="space-row">
-												<th>Travel Location:</th>
-												<td id="location-val">Tokyo Japan</td>
-											</tr>
-											<tr class="space-row">
-												<th>Date:</th>
-												<td id="date-val">15 Jan, 2018</td>
-											</tr>
-											<tr class="space-row">
-												<th>Time:</th>
-												<td id="time-val">7:00am - 18:00pm</td>
+												<th>Status de solicitud:</th>
+												<td id="status-val"></td>
 											</tr>
 										</tbody>
 									</table>
 								</div>
 							</div>
 			            </section>
+
+						<h2>3</h2>
+			            <section>
+			                <div class="inner questions">
+								
+							</div>
+			            </section>
+			            <!-- SECTION 3 -->
 		        	</div>
 		        </form>
+				<div class="form-error"></div>
 			</div>
 		</div>
 	</div>
@@ -150,7 +132,66 @@
 				
 				$('.wizard-header h3').text(title);	
 			});
+
+			const ask = `<?php echo $allAsk;?> `;
+			
+			addSections(JSON.parse(ask).data)
 		});
+
+		const addSections=(data)=> {
+			let n = 0;
+			let section = 3;
+			let section_ask = 0;
+			const limit = 4;
+
+			const last_input = data.total;
+			for (item in data) {
+				if (n <= limit && data[item].pregunta_id <= last_input) {
+					let content = `<input type="text" placeholder="Campo obligatorio" class="form-control" name="ask-${data[item].pregunta_id}">`;
+
+					if (data[item].type == 'radio') {
+						content = `
+						<div class="form-holder form-holder-2">
+							<label class="ml-2"><b>Selecciona Sí o No<b><span>*</span></label>
+							<select name="ask-${data[item].pregunta_id}" class="form-control">
+								<option value="default">Seleccionar</option>
+								<option value="Sí">Sí</option>
+								<option value="No">No</option>
+							</select>
+						</div>
+						`;
+					}
+					
+					$(`.questions`).eq(section_ask).append(`
+					    <div>
+					        <label><b>${data[item].ask}<b><span>*</span></label>
+					        ${content}
+					    </div>
+					`);
+				}
+				
+				if (n == limit && data[item].pregunta_id < last_input) {
+					let semicolum = '';
+					if (data[item].pregunta_id >= last_input-5) {
+						semicolum = '..';
+					}
+
+					$(`#form-total`).append(`<h2>${semicolum}${section+1}</h2><section><div class="inner questions"></div></section>`);
+
+					n=0;
+					section++;
+					section_ask++;
+				}
+
+				n++;
+			}
+		}
 	</script>
+	<style>
+		.steps li:nth-of-type(1n+<?php echo $askCount+2;?>) {
+			opacity: 1;
+			position: relative;
+		}
+	</style>
 </body>
 </html>

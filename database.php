@@ -1,18 +1,19 @@
 <?php
+require_once '../vendor/autoload.php';
 
 header('Content-type: text/plain; charset=utf-8');
 
-require './vendor/autoload.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 use Medoo\Medoo;
-
 // Connect to the database.
 $database = new Medoo([
     'type' => 'mysql',
-    'host' => 'https://agenciadeviajes.do/',
-    'database' => 'agenciad_consulation',
-    'username' => 'agenciad',
-    'password' => 'Eydam862301',
+    'host' => 'localhost',
+    'database' => 'consulations',
+    'username' => 'root',
+    'password' => '',
 ]);
 
-print_r($database);
+?>

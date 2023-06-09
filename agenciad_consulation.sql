@@ -1,177 +1,71 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: localhost:3306
--- Tiempo de generación: 07-06-2023 a las 00:28:30
--- Versión del servidor: 10.6.13-MariaDB
--- Versión de PHP: 8.1.16
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `agenciad_consulation`
---
-
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Versión del servidor:         8.0.30 - MySQL Community Server - GPL
+-- SO del servidor:              Win64
+-- HeidiSQL Versión:             12.1.0.6537
 -- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `answers`
---
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE TABLE `answers` (
-  `answer_id` int(11) NOT NULL,
-  `consultation_id` bigint(20) NOT NULL,
-  `ask_id` bigint(20) NOT NULL,
+
+-- Volcando estructura de base de datos para consulations
+CREATE DATABASE IF NOT EXISTS `consulations` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `consulations`;
+
+-- Volcando estructura para tabla consulations.answers
+CREATE TABLE IF NOT EXISTS `answers` (
+  `answer_id` int NOT NULL AUTO_INCREMENT,
+  `consultation_id` bigint NOT NULL,
+  `ask_id` bigint NOT NULL,
   `answer` text NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
-  `deleted_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `deleted_at` datetime NOT NULL,
+  PRIMARY KEY (`answer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
+-- La exportación de datos fue deseleccionada.
 
---
--- Estructura de tabla para la tabla `consultations`
---
-
-CREATE TABLE `consultations` (
-  `consultation_id` int(255) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `last_name` int(50) NOT NULL,
+-- Volcando estructura para tabla consulations.consultations
+CREATE TABLE IF NOT EXISTS `consultations` (
+  `consultation_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `last_name` varchar(50) NOT NULL DEFAULT '0',
   `cedula` varchar(50) NOT NULL,
   `phone` varchar(17) NOT NULL,
   `cellphone` varchar(17) NOT NULL,
-  `natrip_id` bigint(20) NOT NULL,
-  `approved_at` datetime NOT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `deleted_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `email` varchar(50) NOT NULL,
+  `natrip_id` bigint NOT NULL,
+  `status` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`consultation_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
---
--- Volcado de datos para la tabla `consultations`
---
+-- La exportación de datos fue deseleccionada.
 
-INSERT INTO `consultations` (`consultation_id`, `name`, `last_name`, `cedula`, `phone`, `cellphone`, `natrip_id`, `approved_at`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'abiezer', 0, '03105686210', '8498757724', '', 1000000, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(2, 'abiezer', 0, '03105686210', '8498757724', '', 1000000, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(3, 'abiezer', 0, '03105686210', '8498757724', '', 1000000, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(4, 'abiezer', 0, '03105686210', '8498757724', '', 1000000, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00', '0000-00-00 00:00:00');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `preguntas`
---
-
-CREATE TABLE `preguntas` (
-  `pregunta_id` int(11) NOT NULL,
-  `ask` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+-- Volcando estructura para tabla consulations.preguntas
+CREATE TABLE IF NOT EXISTS `preguntas` (
+  `pregunta_id` int NOT NULL AUTO_INCREMENT,
+  `ask` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `correct` text NOT NULL,
-  `type` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `type` text CHARACTER SET latin1 COLLATE latin1_swedish_ci,
+  PRIMARY KEY (`pregunta_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=latin1;
 
---
--- Volcado de datos para la tabla `preguntas`
---
+-- La exportación de datos fue deseleccionada.
 
-INSERT INTO `preguntas` (`pregunta_id`, `ask`, `correct`, `type`) VALUES
-(1, 'Â¿CuÃ¡l es el propÃ³sito principal de tu viaje a Estados Unidos?', '', ''),
-(2, 'Â¿CuÃ¡nto tiempo planeas quedarte en Estados Unidos?', '', ''),
-(3, 'Â¿Tienes algÃºn familiar o amigo en Estados Unidos que te pueda proporcionar apoyo durante tu estadÃ­a?', '', ''),
-(4, 'Â¿Tienes algÃºn plan especÃ­fico para tu visita a Estados Unidos?', '', ''),
-(5, 'Â¿QuÃ© actividades o eventos tienes planeados durante tu estancia en Estados Unidos?', '', ''),
-(6, 'Â¿Has visitado Estados Unidos anteriormente? Si es asÃ­, Â¿CuÃ¡ntas veces y por quÃ© motivo?', '', ''),
-(7, 'Â¿Tienes empleo o negocios estables en tu paÃ­s de origen?', '', ''),
-(8, 'Â¿Has viajado a otros paÃ­ses anteriormente? Si es asÃ­, Â¿puedes proporcionar detalles sobre esos viajes?', '', ''),
-(9, 'Â¿Posees propiedades o bienes en tu paÃ­s de origen?', '', 'check'),
-(10, 'Â¿CuÃ¡l es tu profesiÃ³n actual y en quÃ© empresa trabajas?', '', ''),
-(11, 'Â¿Has realizado estudios o cursos de formaciÃ³n relevantes para tu ocupaciÃ³n actual?', '', ''),
-(12, 'Â¿Tienes algÃºn tÃ­tulo acadÃ©mico o certificaciÃ³n profesional?', '', ''),
-(13, 'Â¿Has sido invitado a participar en conferencias, seminarios o eventos en Estados Unidos?', '', ''),
-(14, 'Â¿CuÃ¡l es tu historial de empleo y cuÃ¡nto tiempo has trabajado en tu empleo actual?', '', ''),
-(15, 'Â¿Has participado en actividades comunitarias o benÃ©ficas en tu paÃ­s de origen?', '', ''),
-(16, 'Â¿CuÃ¡les son tus lazos familiares y sociales en tu paÃ­s de origen?', '', ''),
-(17, 'Â¿Cuentas con recursos financieros suficientes para cubrir los gastos de tu viaje y estancia en Estados Unidos?', '', ''),
-(18, 'Â¿Has cumplido con las leyes de inmigraciÃ³n en tus viajes anteriores a otros paÃ­ses?', '', ''),
-(19, 'Â¿Has recibido alguna beca o premio acadÃ©mico o profesional?', '', ''),
-(20, 'Â¿Tienes algÃºn plan de regreso establecido a tu paÃ­s de origen despuÃ©s de tu visita a Estados Unidos?', '', ''),
-(21, 'Â¿Tienes intenciones de buscar empleo en Estados Unidos durante tu estadÃ­a?', '0', 'check'),
-(22, 'Â¿Has sido deportado o expulsado de algÃºn paÃ­s en el pasado?', '0', 'check'),
-(23, 'Â¿Has permanecido mÃ¡s tiempo del permitido en otro paÃ­s durante visitas anteriores?', '0', 'check'),
-(24, 'Â¿Has estado involucrado en actividades delictivas en tu paÃ­s de origen o en otros paÃ­ses?', '0', 'check'),
-(25, 'Â¿Tienes antecedentes penales o has sido arrestado alguna vez?', '0', 'check'),
-(26, 'Â¿Has intentado ingresar ilegalmente a algÃºn paÃ­s en el pasado?', '0', 'check'),
-(27, 'Â¿Has sido rechazado previamente para obtener una visa a Estados Unidos u otro paÃ­s?', '0', 'check'),
-(28, 'Â¿Tienes algÃºn tipo de enfermedad o condiciÃ³n mÃ©dica que pueda representar un riesgo para la salud pÃºblica en Estados Unidos?', '0', 'check'),
-(29, 'Â¿Has sido investigado o acusado de estar involucrado en actividades terroristas?', '0', 'check'),
-(30, 'Â¿Has sido investigado o acusado de estar involucrado en actividades terroristas?', '0', 'check'),
-(31, 'Â¿Has mentido o proporcionado informaciÃ³n falsa en solicitudes de visa anteriores?', '0', 'check'),
-(32, 'Â¿Tienes vÃ­nculos con organizaciones criminales o grupos extremistas?', '0', 'check'),
-(33, 'Â¿Has trabajado o realizado actividades no autorizadas en Estados Unidos durante visitas anteriores?', '0', 'check'),
-(34, 'Â¿Has violado las leyes de inmigraciÃ³n en otros paÃ­ses?', '0', 'check'),
-(35, 'Â¿Has solicitado asilo en algÃºn paÃ­s anteriormente?', '0', 'check'),
-(36, 'Â¿Has utilizado documentos de identidad falsos o fraudulentos?', '0', 'check'),
-(37, 'Â¿Has estado implicado en casos de fraude o corrupciÃ³n en tu paÃ­s de origen?', '0', 'check'),
-(38, 'Â¿Tienes deudas significativas o problemas financieros graves?', '0', 'check'),
-(39, 'Â¿Has participado en actividades ilegales relacionadas con drogas o sustancias controladas?', '0', 'check'),
-(40, 'Â¿Has sido previamente denegado en solicitudes de visa a Estados Unidos por razones de inmigraciÃ³n?', '0', 'check'),
-(41, 'Â¿Has falsificado documentos o proporcionado informaciÃ³n falsa en tu solicitud de visa actual?', '0', 'check');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `answers`
---
-ALTER TABLE `answers`
-  ADD PRIMARY KEY (`answer_id`);
-
---
--- Indices de la tabla `consultations`
---
-ALTER TABLE `consultations`
-  ADD PRIMARY KEY (`consultation_id`);
-
---
--- Indices de la tabla `preguntas`
---
-ALTER TABLE `preguntas`
-  ADD PRIMARY KEY (`pregunta_id`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `answers`
---
-ALTER TABLE `answers`
-  MODIFY `answer_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `consultations`
---
-ALTER TABLE `consultations`
-  MODIFY `consultation_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT de la tabla `preguntas`
---
-ALTER TABLE `preguntas`
-  MODIFY `pregunta_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
-COMMIT;
-
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
