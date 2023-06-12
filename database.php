@@ -8,12 +8,19 @@ error_reporting(E_ALL);
 
 use Medoo\Medoo;
 // Connect to the database.
+// $database = new Medoo([
+//     'type' => 'mysql',
+//     'host' => 'localhost',
+//     'database' => 'consulations',
+//     'username' => 'root',
+//     'password' => '',
+// ]);
+
 $database = new Medoo([
     'type' => 'mysql',
     'host' => 'localhost',
-    'database' => 'consulations',
-    'username' => 'root',
-    'password' => '',
+    'database' => 'agenciad_consulation',
+    'username' => 'agenciad_mster',
+    'password' => '$Delakal21',
 ]);
-
 ?>
