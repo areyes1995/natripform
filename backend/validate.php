@@ -124,11 +124,11 @@ class Validate
             $this->data = ['error' => 'Está cuenta no está asociada a nosotros, favor contactar al 809-475-8831 para más información.'];
         }
     }
-    
+
     public function save_ask()
     {
-        $natrip_id = $this->get_post('natrip_id');
         $cedula = $this->get_post('cedula_');
+        $natrip_id = $this->get_post('natrip_id');
 
         $natrip_index = strpos($natrip_id, 'natrip');
         if ($natrip_index >= 0) {
@@ -220,7 +220,7 @@ class Validate
             $this->data = ['error' => 'Hubo un error al guardar los datos suministrados. O hay alguna pregunta sin contestar. Favor contactar al 809-475-8831 para más información.'];
         }
     }
-    
+
     public function store_new()
     {
         $name = $this->get_post('name');
@@ -281,7 +281,8 @@ class Validate
         return $d;
     }
 
-    public function json_print() {
+    public function json_print()
+    {
         print_r(
             json_encode(
                 $this->utf8ize([
