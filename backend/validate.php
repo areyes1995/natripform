@@ -1,155 +1,149 @@
-<?php 
+<?php
 include '../database.php';
 
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: text/plain");
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: text/plain');
 
 $data = [];
 
-// $data = $database->select("consultations", '*', [
-//     "natrip_id[=]" => 1000000,
-//     "cedula[=]" => '03105686210',
-// ]);
+$validate = new Validate($database);
+$validate->json_print();
 
-// if (count($data) > 0) {
-//     $data[0]['questions'] = $database->select("preguntas", '*',);
-//     $data = $data[0];
-// }
+class Validate
+{
+    public $database;
+    public $data = [];
 
-// $natrip_id = (array)$database->select("consultations", ['natrip_id'], ['LIMIT' => 1, "ORDER" => [
-//     "natrip_id" => "DESC",
-// ]])[0];
+    public function __construct($database)
+    {
+        $this->database = $database;
 
-// print_r($natrip_id['natrip_id']);
-// return;
-foreach ($_GET as $key => $item) {
-    if ($key == 'valid') {
-        $natrip_id =isset($_POST['natrip_id']) ? htmlspecialchars($_POST['natrip_id']) : '';
-        $cedula= isset($_POST['cedula_']) ? htmlspecialchars($_POST['cedula_']) : '';
-        
+        $this->init();
+    }
+
+    public function init()
+    {
+        foreach ($_GET as $key => $item) {
+            if ($key == 'valid') {
+                $this->valid();
+            }
+            if ($key == 'allAsk') {
+                $this->allAsk();
+            }
+            if ($key == 'crearNap') {
+                $this->crearNap();
+            }
+            if ($key == 'access') {
+                $this->allAsk();
+            }
+            if ($key == 'save_ask') {
+                $this->save_ask();
+            }
+        }
+    }
+
+    public function valid()
+    {
+        $natrip_id = $this->get_post('natrip_id');
+        $cedula = $this->get_post('cedula_');
+
         $natrip_index = strpos($natrip_id, 'natrip');
         if ($natrip_index >= 0) {
-            $natrip_id = substr($natrip_id, $natrip_index+6, strlen($natrip_id));
+            $natrip_id = substr($natrip_id, $natrip_index + 6, strlen($natrip_id));
 
-            $data = $database->select("consultations", '*', [
-                "natrip_id[=]" => $natrip_id,
-                "cedula[=]" => $cedula,
+            $this->data = $this->database->select('consultations', '*', [
+                'natrip_id[=]' => $natrip_id,
+                'cedula[=]' => $cedula,
             ]);
         }
 
-        if (count($data) > 0) {
-            $data = $data[0];
+        if (count($this->data) > 0) {
+            $this->data = $this->data[0];
         }
     }
 
-    if ($key == 'allAsk') {
-        $data = $database->select("preguntas", ['ask', 'type', 'pregunta_id'],);
-        $data['total'] =count($data);
+    public function allAsk()
+    {
+        $data = $this->database->select('preguntas', ['ask', 'type', 'pregunta_id']);
+        $data['total'] = count($data);
     }
-    
-    if ($key == 'crearNap') {
-        $natrip_id = (array)$database->select("consultations", ['natrip_id'], ['LIMIT' => 1, "ORDER" => [
-            "natrip_id" => "DESC",
-        ]])[0];
 
-        $user =isset($_POST['user']) ? htmlspecialchars($_POST['user']) : '';
-        $password =isset($_POST['password']) ? htmlspecialchars($_POST['password']) : '';
-        $email =isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '';
-        $consultation_id =isset($_POST['consultation_id']) ? htmlspecialchars($_POST['consultation_id']) : '';
+    public function crearNap()
+    {
+        $natrip_id = (array) $this->database->select(
+            'consultations',
+            ['natrip_id'],
+            [
+                'LIMIT' => 1,
+                'ORDER' => [
+                    'natrip_id' => 'DESC',
+                ],
+            ],
+        )[0];
+
+        $user = $this->get_post('user');
+        $email = $this->get_post('email');
+        $password = $this->get_post('password');
+        $consultation_id = $this->get_post('consultation_id');
 
         if ($user == 'neotrips23@gmail.com' && $password == 'Nathaly862301' && strlen($password) > 5) {
             try {
-                $database->update("consultations", [
-                    "natrip_id" => (int)$natrip_id['natrip_id']+1,
-                    "approved_at" => date('Y-m-d'),
-                ], [
-                    'consultation_id[=]' => $consultation_id,
-                    'natrip_id[=]' => null,
-                ]);
+                $this->database->update(
+                    'consultations',
+                    [
+                        'natrip_id' => (int) $natrip_id['natrip_id'] + 1,
+                        'approved_at' => date('Y-m-d'),
+                    ],
+                    [
+                        'consultation_id[=]' => $consultation_id,
+                        'natrip_id[=]' => null,
+                    ],
+                );
 
-                $mensaje = "Este es tu código de autorización Natrip".($natrip_id['natrip_id']+1)." de https://agenciadeviajes.do/ ahora puedes ingresar al formulario https://consulate.agenciadeviajes.do/ y responder las preguntas. \r\n\r\nUna vez completes el formulario de Visado haremos la revisión y te dejaremos saber sí ház sido calificado para tu Visado.\r\n\r\n.";
-
-                // Si cualquier línea es más larga de 70 caracteres, se debería usar wordwrap()
+                $mensaje = 'Este es tu código de autorización Natrip' . ($natrip_id['natrip_id'] + 1) . " de https://agenciadeviajes.do/ ahora puedes ingresar al formulario https://consulate.agenciadeviajes.do/ y responder las preguntas. \r\n\r\nUna vez completes el formulario de Visado haremos la revisión y te dejaremos saber sí ház sido calificado para tu Visado.\r\n\r\n.";
                 $mensaje = wordwrap($mensaje, 70, "\r\n");
 
                 // Enviarlo
-                $cabeceras = 'From: Info@agenciadeviajes.do' . "\r\n" .'Reply-To: Info@agenciadeviajes.do';
-                mail($email, 'Código de autorización | agenciadeviajes.do', $mensaje, $cabeceras);
+                mail($email, 'Código de autorización | agenciadeviajes.do', $mensaje, 'From: Info@agenciadeviajes.do' . "\r\n" . 'Reply-To: Info@agenciadeviajes.do');
 
                 $data = 1;
-            }
-            catch(Exception $error) {
+            } catch (Exception $error) {
                 $data = 0;
             }
         }
     }
-    
-    if ($key == 'access') {
-        $user =isset($_POST['user']) ? htmlspecialchars($_POST['user']) : '';
-        $password =isset($_POST['password']) ? htmlspecialchars($_POST['password']) : '';
+
+    public function access()
+    {
+        $user = $this->get_post('user');
+        $password = $this->get_post('password');
 
         if ($user == 'neotrips23@gmail.com' && $password == 'Nathaly862301') {
-            $data = $database->select("consultations", '*', ["ORDER" => [
-                    "consultation_id" => "DESC",]]);
+            $this->data = $this->database->select('consultations', '*', ['ORDER' => ['consultation_id' => 'DESC']]);
         } else {
-            $data = ['error' => 'Está cuenta no está asociada a nosotros, favor contactar al 809-475-8831 para más información.'];
+            $this->data = ['error' => 'Está cuenta no está asociada a nosotros, favor contactar al 809-475-8831 para más información.'];
         }
     }
+    
+    public function save_ask()
+    {
+        $natrip_id = $this->get_post('natrip_id');
+        $cedula = $this->get_post('cedula_');
 
-    if ($key == 'store_new') {
-        $visa_type =isset($_POST['visa_type']) ? htmlspecialchars($_POST['visa_type']) : '';
-        $name =isset($_POST['name']) ? htmlspecialchars($_POST['name']) : '';
-        $last_name =isset($_POST['last_name']) ? htmlspecialchars($_POST['last_name']) : '';
-        $email =isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '';
-        $phone =isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '';
-        $cellphone =isset($_POST['cellphone']) ? htmlspecialchars($_POST['cellphone']) : ''; //opcional
-        $cedula =isset($_POST['cedula']) ? htmlspecialchars($_POST['cedula']) : '';
-
-        if ($name != '' && $last_name != '' && $email != '' && $phone != '' && $cedula != '') {
-            $cedula_sql = (array)$database->select("consultations", ['cedula'], 
-                    [
-                        'cedula[=]'=>$cedula, 
-                        'created_at[>=]' => date('Y-m-d', strtotime(date('Y-m-d'). '-1 year'))
-                    ]);
-
-            if (count($cedula_sql) > 0) {
-                $data = ['error' => 'Está cuenta ya ha sido creada, favor contactar al 809-475-8831 para más información.'];
-            } else {                
-                $database->insert("consultations", [
-                    'visa_type' => strtolower($visa_type),
-                    'name' => strtolower($name),
-                    'last_name' => strtolower($last_name), 
-                    'email' => strtolower($email), 
-                    'phone' => $phone, 
-                    'cellphone' => $cellphone, 
-                    'cedula' => $cedula,
-                    // 'natrip_id' => (int)$natrip_id['natrip_id']+1, 
-                    'created_at' => date('Y-m-d H:i:s'),
-                ]);
-
-                if ($database->id() !== null && $database->id() > 0) {
-                    $data = ['done' => 'Data saved correctly.'];
-                }
-            }
-        } else {
-            $data = ['error' => 'Some fields are required'];
-        }
-    }
-
-    if ($key == 'save_ask') {
-        $natrip_id =isset($_POST['natrip_id']) ? htmlspecialchars($_POST['natrip_id']) : '';
-        $cedula= isset($_POST['cedula_']) ? htmlspecialchars($_POST['cedula_']) : '';
-        
         $natrip_index = strpos($natrip_id, 'natrip');
         if ($natrip_index >= 0) {
-            $natrip_id = substr($natrip_id, $natrip_index+6, strlen($natrip_id));
+            $natrip_id = substr($natrip_id, $natrip_index + 6, strlen($natrip_id));
 
-            $consultation = $database->select("consultations", ['consultation_id', 'email'], [
-                "natrip_id[=]" => $natrip_id,
-                "cedula[=]" => $cedula,
-                'created_at[>=]' => date('Y-m-d', strtotime(date('Y-m-d'). '-1 year')),
-                'LIMIT' => 1,
-            ]);
+            $consultation = $this->database->select(
+                'consultations',
+                ['consultation_id', 'email'],
+                [
+                    'natrip_id[=]' => $natrip_id,
+                    'cedula[=]' => $cedula,
+                    'created_at[>=]' => date('Y-m-d', strtotime(date('Y-m-d') . '-1 year')),
+                    'LIMIT' => 1,
+                ],
+            );
         }
 
         if (count($consultation) > 0) {
@@ -157,32 +151,34 @@ foreach ($_GET as $key => $item) {
             $status_visa = true;
             if (count($_POST) >= 40) {
                 foreach ($_POST as $key => $value) {
-                    if (strpos($key,  'ask-') > -1 && ($value !== null && strlen($value) > 0 && $value != 'default')) {
-                        $ask_id = (int)str_replace('ask-', '', $key);
+                    if (strpos($key, 'ask-') > -1 && ($value !== null && strlen($value) > 0 && $value != 'default')) {
+                        $ask_id = (int) str_replace('ask-', '', $key);
                         try {
-                            $correct = $database->select("preguntas", ['correct'], 
-                            [
-                                'pregunta_id' => $ask_id,
-                                'correct[!]'=>NULL,
-                            ]);
+                            $correct = $this->database->select(
+                                'preguntas',
+                                ['correct'],
+                                [
+                                    'pregunta_id' => $ask_id,
+                                    'correct[!]' => null,
+                                ],
+                            );
 
                             if (count($correct) > 0) {
-                                $value = ($value == 1) ? true : false;
-                                if ($value != (bool)$correct[0]['correct']) {
+                                $value = $value == 1 ? true : false;
+                                if ($value != (bool) $correct[0]['correct']) {
                                     $status_visa = false;
                                 }
                             }
-                            
-                            $database->insert("answers", [
+
+                            $this->database->insert('answers', [
                                 'consultation_id' => $consultation[0]['consultation_id'],
                                 'ask_id' => $ask_id,
                                 'answer' => $value,
                                 'created_at' => date('Y-m-d'),
                             ]);
-                            
+
                             $status = true;
-                        }
-                        catch(Exception $error) {
+                        } catch (Exception $error) {
                             $status = false;
                             break;
                         }
@@ -200,44 +196,99 @@ foreach ($_GET as $key => $item) {
                 }
 
                 try {
-                    $database->update("consultations", [
-                        "status" => $visa_status,
-                    ], [
-                        'consultation_id[=]' => $consultation[0]['consultation_id'],
-                    ]);
-                }
-                catch(Exception $error) {
-                    mail('abiezer.reyes95@gmail.com', 'Error al guardar status | agenciadeviajes.do', 'ID:'.$consultation[0]['consultation_id'], $cabeceras);    
+                    $this->database->update(
+                        'consultations',
+                        [
+                            'status' => $visa_status,
+                        ],
+                        [
+                            'consultation_id[=]' => $consultation[0]['consultation_id'],
+                        ],
+                    );
+                } catch (Exception $error) {
+                    mail('abiezer.reyes95@gmail.com', 'Error al guardar status | agenciadeviajes.do', 'ID:' . $consultation[0]['consultation_id'], 'From: Info@agenciadeviajes.do' . "\r\n" . 'Reply-To: Info@agenciadeviajes.do');
                 }
 
-                $cabeceras = 'From: Info@agenciadeviajes.do' . "\r\n" .'Reply-To: Info@agenciadeviajes.do';
+                $cabeceras = 'From: Info@agenciadeviajes.do' . "\r\n" . 'Reply-To: Info@agenciadeviajes.do';
                 mail($consultation[0]['email'], 'Aprobación de tu visa | agenciadeviajes.do', $mensaje, $cabeceras);
 
                 if ($status === true) {
-                    $data = true;
+                    $this->data = true;
                 }
             }
         } else {
-            $data = ['error' => 'Hubo un error al guardar los datos suministrados. O hay alguna pregunta sin contestar. Favor contactar al 809-475-8831 para más información.'];
+            $this->data = ['error' => 'Hubo un error al guardar los datos suministrados. O hay alguna pregunta sin contestar. Favor contactar al 809-475-8831 para más información.'];
         }
     }
-}
+    
+    public function store_new()
+    {
+        $name = $this->get_post('name');
+        $email = $this->get_post('email');
+        $phone = $this->get_post('phone');
+        $cedula = $this->get_post('cedula');
+        $cellphone = $this->get_post('cellphone');
+        $last_name = $this->get_post('last_name');
+        $visa_type = $this->get_post('visa_type');
 
-function utf8ize($d) {
-    if (is_array($d)) {
-       foreach ($d as $k => $v) {
-         $d[$k] = utf8ize($v);
-       }
-    } else if (is_string ($d)) {
-       return mb_convert_encoding($d, 'UTF-8');
+        if ($name != '' && $last_name != '' && $email != '' && $phone != '' && $cedula != '') {
+            $cedula_sql = (array) $this->database->select(
+                'consultations',
+                ['cedula'],
+                [
+                    'cedula[=]' => $cedula,
+                    'created_at[>=]' => date('Y-m-d', strtotime(date('Y-m-d') . '-1 year')),
+                ],
+            );
+
+            if (count($cedula_sql) > 0) {
+                $this->data = ['error' => 'Está cuenta ya ha sido creada, favor contactar al 809-475-8831 para más información.'];
+            } else {
+                $this->database->insert('consultations', [
+                    'visa_type' => strtolower($visa_type),
+                    'name' => strtolower($name),
+                    'last_name' => strtolower($last_name),
+                    'email' => strtolower($email),
+                    'phone' => $phone,
+                    'cellphone' => $cellphone,
+                    'cedula' => $cedula,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+
+                if ($this->database->id() !== null && $this->database->id() > 0) {
+                    $this->data = ['done' => 'Data saved correctly.'];
+                }
+            }
+        } else {
+            $this->data = ['error' => 'Some fields are required'];
+        }
     }
-     return $d;
-  }
 
-// print_r([
-//     'data' => $data
-// ]);
-print_r(json_encode(utf8ize([
-    'data' => $data
-])));
+    private function get_post(string $name)
+    {
+        return isset($_POST[$name]) ? htmlspecialchars($_POST[$name]) : '';
+    }
+
+    private function utf8ize($d)
+    {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = $this->utf8ize($v);
+            }
+        } elseif (is_string($d)) {
+            return mb_convert_encoding($d, 'UTF-8');
+        }
+        return $d;
+    }
+
+    public function json_print() {
+        print_r(
+            json_encode(
+                $this->utf8ize([
+                    'data' => $this->data,
+                ]),
+            ),
+        );
+    }
+}
 ?>
