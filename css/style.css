@@ -418,4 +418,7 @@ select{
 	.wizard-v2-content .wizard-image  {
 		position: relative;
 	}
+	.autorizar-2 {
+		display: none;
+	}
 }
