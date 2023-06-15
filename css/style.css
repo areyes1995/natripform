@@ -412,4 +412,10 @@ select{
 		padding-bottom: 30px;
 	}
 	
-} 
+}
+
+@media only screen and (max-width: 800px) {
+	.wizard-v2-content .wizard-image  {
+		position: relative;
+	}
+}

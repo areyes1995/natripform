@@ -50,7 +50,7 @@ const startWizard=()=> {
                         if (data.data?.consultation_id > 0) {
                             secondStep(data.data);
                             
-                            if (data.data.status.length > 0 && data.data.status !== null) {
+                            if (data.data?.status !== null) {
                                 localStorage.setItem('status_changed', null);
                             } else {
                                 localStorage.setItem('status_changed', true);
@@ -167,5 +167,5 @@ const secondStep=(data)=> {
     $('#fullname-val').html(`${data.name} ${data.last_name}`);
     $('#phone-val').html(data.phone);
     $('#email-val').html(data.email);
-    $('#status-val').html(data.status);
+    $('#status-val').html(data.status !== null ? data.status : 'Pending');
 }
